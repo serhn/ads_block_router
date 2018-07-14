@@ -9,8 +9,12 @@ boot(){
 start() {
     echo "starting ADS block"
     wget http://winhelp2002.mvps.org/hosts.txt -O - -q | grep 0.0.0.0 | sed 's/^\(.*\)#.*$/\1/'  > /tmp/hosts_ads
-    uci add_list dhcp.@dnsmasq[0].addnhosts='/tmp/hosts_ads'
-    uci commit dhcp
+NHOSTS=`uci show dhcp | grep addnhost | wc -l`
+    if [ "$NHOSTS" =  "0" ]
+    then
+        uci add_list dhcp.@dnsmasq[0].addnhosts='/tmp/hosts_ads'
+        uci commit dhcp
+    fi
     /etc/init.d/dnsmasq restart
     echo "started ADS" 
 }
